@@ -14,8 +14,8 @@ def predict(prompt, tokenizer, model, max_len, device):
     inputs = {k: v.to(device) for k, v in inputs.items()}
     with torch.no_grad():
         outputs = model(**inputs)
-        predicted_class = torch.argmax(outputs.logits, dim=-1).item()
-    return predicted_class
+        predicted_len = torch.argmax(outputs.logits, dim=-1).item()
+    return predicted_len
 
 def main(args):
     device = torch.device("cuda" if torch.cuda.is_available() and not args.cpu else "cpu")
