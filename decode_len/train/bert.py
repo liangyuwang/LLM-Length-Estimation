@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+
 import numpy as np
 import json, argparse, torch
 from torch.utils.data import Dataset, Subset
@@ -39,7 +43,7 @@ def main(args):
 
     # Split train/val
     indices = list(range(len(full_dataset)))
-    train_idx, val_idx = train_test_split(indices, test_size=0.1, random_state=42)
+    train_idx, val_idx = train_test_split(indices, test_size=0.01, random_state=42)
     train_dataset = Subset(full_dataset, train_idx)
     val_dataset = Subset(full_dataset, val_idx)
 
@@ -61,6 +65,7 @@ def main(args):
         logging_steps=args.logging_steps,
         lr_scheduler_type = "linear",
         warmup_ratio = 0.1,
+        torch_compile=True,
     )
 
     trainer = Trainer(
@@ -76,13 +81,13 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--bert_model", type=str, default="bert-large-uncased")
+    parser.add_argument("--bert_model", type=str, default="bert-base-uncased")
     parser.add_argument("--dataset_path", type=str, default="len_pred/prompt_lengths.jsonl")
     parser.add_argument("--output_dir", type=str, default="len_pred/bert_length_predictor")
     parser.add_argument("--evaluation_strategy", type=str, default="steps")
     parser.add_argument("--eval_steps", type=int, default=1000)
     parser.add_argument("--save_strategy", type=str, default="steps")
-    parser.add_argument("--save_total_limit", type=int, default=1)
+    parser.add_argument("--save_total_limit", type=int, default=2)
     parser.add_argument("--save_steps", type=int, default=1000)
     parser.add_argument("--metric_for_best_model", type=str, default="eval_loss")
     parser.add_argument("--greater_is_better", action="store_true")

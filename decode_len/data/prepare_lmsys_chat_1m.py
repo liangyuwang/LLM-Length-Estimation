@@ -1,3 +1,4 @@
+import os
 import json, argparse
 from tqdm import tqdm
 from datasets import load_dataset
@@ -54,12 +55,14 @@ if __name__ == "__main__":
     parser.add_argument("--tokenizer_id", type=str, default=None, help="tokenizer (default the same to model_id)")
     parser.add_argument("--max_new_tokens", type=int, default=512)
     parser.add_argument("--device", type=int, default=0)
-    parser.add_argument("--output_path", type=str, default="data/prompt_lengths.jsonl")
+    parser.add_argument("--output_path", type=str, default="exps/data/lmsys_bert_prompt_lengths.jsonl")
     parser.add_argument("--k", type=int, default=0, help="Number of response tokens to append to prompt")
     args = parser.parse_args()
     if args.output_path is not None:
         if f"_k{args.k}" not in args.output_path:
                 args.output_path = args.output_path.rsplit(".", 1)[0] + f"_k{args.k}.jsonl"
     else:
-        args.output_path = f"len_pred/prompt_lengths_k{args.k}.jsonl"
+        args.output_path = f"exps/data/prompt_lengths_k{args.k}.jsonl"
+    dir_path = os.path.dirname(args.output_path)
+    os.makedirs(dir_path, exist_ok=True)
     main(args)

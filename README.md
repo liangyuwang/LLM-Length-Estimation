@@ -10,15 +10,16 @@ In LLM inference and RL training, decoding length varies significantly across pr
 
 # 📄 Prepare Dataset
 To train a length prediction model, you need a .jsonl dataset with prompt-text and corresponding response length. Each line should follow this format:
-
-json
-```
+```json
 {
   "prompt": "Write a short story about a dragon.",
   "length": 128
 }
 ```
 You can collect prompt-response pairs from public LLM benchmarks (e.g., LMSYS, AlpacaEval) and compute length as the number of generated tokens.
+```shell
+python decode_len/data/prepare_lmsys_chat_1m.py
+```
 
 Place the file at exps/data/prompt_lengths_k0.jsonl or modify --dataset_path accordingly.
 
