@@ -35,7 +35,7 @@ def freeze_bert_except_classifier(model):
 
 def main(args):
     set_seed(42)
-    tokenizer = BertTokenizer.from_pretrained(args.bert_model)
+    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
     model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=args.max_length)
     # model = freeze_bert_except_classifier(model)
 
@@ -43,7 +43,7 @@ def main(args):
 
     # Split train/val
     indices = list(range(len(full_dataset)))
-    train_idx, val_idx = train_test_split(indices, test_size=0.01, random_state=42)
+    train_idx, val_idx = train_test_split(indices, test_size=args.test_size, random_state=42)
     train_dataset = Subset(full_dataset, train_idx)
     val_dataset = Subset(full_dataset, val_idx)
 
@@ -76,7 +76,11 @@ def main(args):
         compute_metrics=compute_metrics,
     )
 
-    trainer.train()
+    resume = os.path.isdir(args.output_dir) and any(
+        d.startswith("checkpoint-") and os.path.isdir(os.path.join(args.output_dir, d))
+        for d in os.listdir(args.output_dir)
+    )
+    trainer.train(resume_from_checkpoint=resume)
     
 
 if __name__ == "__main__":
@@ -96,6 +100,7 @@ if __name__ == "__main__":
     parser.add_argument("--max_len", type=int, default=128)
     parser.add_argument("--max_length", type=int, default=1024)  # max predicted token length
     parser.add_argument("--lr", type=float, default=5e-5)
+    parser.add_argument("--test_size", type=float, default=0.01)
     parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--epochs", type=int, default=10)
     args = parser.parse_args()
